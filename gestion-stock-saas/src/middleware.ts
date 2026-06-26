@@ -46,13 +46,11 @@ export default withAuth(
       
       // 1. Routes API Catégories
       if (urlPath.startsWith("/api/categories")) {
-        // La lecture (GET) est ouverte aux ADMIN, MANAGER et SAISIE
         if (req.method === "GET") {
           if (!["ADMIN", "MANAGER", "SAISIE"].includes(role)) {
             return NextResponse.json({ error: "Lecture API refusée." }, { status: 403 });
           }
         } else {
-          // Modifications réservées à ADMIN et SAISIE
           if (role !== "ADMIN" && role !== "SAISIE") {
             return NextResponse.json({ error: "Modification API refusée." }, { status: 403 });
           }
@@ -61,13 +59,11 @@ export default withAuth(
 
       // 2. Routes API Fournisseurs
       if (urlPath.startsWith("/api/fournisseurs")) {
-        // La lecture (GET) doit être accessible au MANAGER et à l'ADMIN pour l'approvisionnement
         if (req.method === "GET") {
           if (!["ADMIN", "MANAGER", "SAISIE"].includes(role)) {
             return NextResponse.json({ error: "Lecture API refusée." }, { status: 403 });
           }
         } else {
-          // L'écriture/modification reste strictement réservée à l'ADMIN
           if (role !== "ADMIN") {
             return NextResponse.json({ error: "Accès API refusé. Rôle ADMIN requis." }, { status: 403 });
           }
@@ -96,21 +92,19 @@ export default withAuth(
         }
       }
 
-      // 5. API des Approvisionnements
-     // 5. API des Approvisionnements et Arrivages
-if (urlPath.startsWith("/api/approvisionnements") || urlPath.startsWith("/api/arrivages")) {
-  // Le MAGASINIER doit pouvoir lire (GET) les arrivages pour afficher son registre ou valider
-  if (req.method === "GET") {
-    if (!["MANAGER", "ADMIN", "MAGASINIER", "SAISIE"].includes(role)) { 
-      return NextResponse.json({ error: "Accès API restreint en lecture." }, { status: 403 });
-    }
-  } else {
-    // Les requêtes d'écriture (POST, PUT, DELETE) restent réservées à l'ADMIN, au MANAGER ou à l'agent autorisé
-    if (!["MANAGER", "ADMIN", "MAGASINIER", "SAISIE"].includes(role)) { 
-      return NextResponse.json({ error: "Modification API restreinte." }, { status: 403 });
-    }
-  }
-}
+      // 5. API des Approvisionnements et Arrivages
+      if (urlPath.startsWith("/api/approvisionnements") || urlPath.startsWith("/api/arrivages")) {
+        if (req.method === "GET") {
+          if (!["MANAGER", "ADMIN", "MAGASINIER", "SAISIE"].includes(role)) { 
+            return NextResponse.json({ error: "Accès API restreint en lecture." }, { status: 403 });
+          }
+        } else {
+          if (!["MANAGER", "ADMIN", "MAGASINIER", "SAISIE"].includes(role)) { 
+            return NextResponse.json({ error: "Modification API restreinte." }, { status: 403 });
+          }
+        }
+      }
+
       // 6. API des Ventes
       if (urlPath.startsWith("/api/sales")) {
         if (!["VENDEUR", "ADMIN", "MANAGER"].includes(role)) {
@@ -238,7 +232,15 @@ if (urlPath.startsWith("/api/approvisionnements") || urlPath.startsWith("/api/ar
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        if (!token && req.nextUrl.pathname.startsWith("/api/")) {
+        const path = req.nextUrl.pathname;
+        
+        // 🔓 ✅ LAISSER PASSER LES APIS PUBLIQUES SANS TOKEN
+        if (path.startsWith("/api/register") || path.startsWith("/api/auth")) {
+          return true;
+        }
+
+        // Pour toutes les autres routes d'API ou de Dashboard, le token est obligatoire
+        if (!token && path.startsWith("/api/")) {
           return false;
         }
         return !!token;
