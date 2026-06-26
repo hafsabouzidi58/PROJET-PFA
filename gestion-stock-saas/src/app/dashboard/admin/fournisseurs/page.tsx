@@ -3,12 +3,21 @@
 import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Search, X, Truck, Phone, User, AlertCircle } from "lucide-react";
 
+// Définition de l'interface pour TypeScript
+interface Fournisseur {
+  id: any;
+  nom: string;
+  contact?: string;
+  telephone?: string;
+  adresse?: string;
+}
+
 export default function FournisseursPage() {
   const [fournisseurs, setFournisseurs] = useState<Fournisseur[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ id: null, nom: "", contact: "", telephone: "", adresse: "" });
+  const [formData, setFormData] = useState<Fournisseur>({ id: null, nom: "", contact: "", telephone: "", adresse: "" });
 
   const loadFournisseurs = async () => {
     try {
