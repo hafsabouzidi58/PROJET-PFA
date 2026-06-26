@@ -56,7 +56,7 @@ export default function CategoriesPage() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Catégories</h1>
@@ -72,7 +72,7 @@ export default function CategoriesPage() {
               placeholder="Rechercher une catégorie..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 text-sm transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 text-sm transition-all"
             />
           </div>
 
@@ -95,8 +95,8 @@ export default function CategoriesPage() {
                   <Tag className="w-6 h-6" />
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => { setFormData({ id: cat.id, nom: cat.nom, description: cat.description || "" }); setIsModalOpen(true); }} className="p-2 hover:text-blue-600"><Edit className="w-4 h-4" /></button>
-                  <button onClick={() => deleteCategorie(cat.id)} className="p-2 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => { setFormData({ id: cat.id, nom: cat.nom, description: cat.description || "" }); setIsModalOpen(true); }} className="p-2 text-gray-400 hover:text-blue-600 transition-colors"><Edit className="w-4 h-4" /></button>
+                  <button onClick={() => deleteCategorie(cat.id)} className="p-2 text-gray-400 hover:text-red-600 transition-colors"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
               <h3 className="font-bold text-gray-900 text-lg">{cat.nom}</h3>
@@ -108,7 +108,7 @@ export default function CategoriesPage() {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-12 text-gray-400">
+          <div className="col-span-full text-center py-12 text-gray-400 font-medium">
             Aucune catégorie ne correspond à votre recherche.
           </div>
         )}
@@ -117,32 +117,38 @@ export default function CategoriesPage() {
       {/* Modale */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-xl">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-gray-100">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold">{formData.id ? "Modifier" : "Ajouter"} une catégorie</h2>
-              <button onClick={() => setIsModalOpen(false)}><X className="text-gray-400" /></button>
+              {/* Ajout de text-gray-900 pour éviter le titre invisible */}
+              <h2 className="text-xl font-bold text-gray-900">{formData.id ? "Modifier" : "Ajouter"} une catégorie</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X size={20} />
+              </button>
             </div>
+            
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Nom</label>
+                <label className="text-sm font-semibold text-gray-700">Nom de la catégorie</label>
                 <input 
+                  type="text"
                   placeholder="ex: Électronique" 
-                  className="w-full p-3 bg-gray-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20"
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 placeholder-gray-400 font-medium transition-all"
                   value={formData.nom}
                   onChange={(e) => setFormData({...formData, nom: e.target.value})}
                   required
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Description</label>
+                <label className="text-sm font-semibold text-gray-700">Description</label>
                 <textarea 
-                  placeholder="Description..." 
-                  className="w-full p-3 bg-gray-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 h-32 resize-none"
+                  placeholder="Ajoutez une description ici..." 
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 h-32 resize-none text-gray-900 placeholder-gray-400 font-medium transition-all"
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                 />
               </div>
-              <button className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-black transition-colors mt-2">
+              
+              <button type="submit" className="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold hover:bg-black transition-colors shadow-sm mt-4">
                 Enregistrer
               </button>
             </form>
