@@ -1,4 +1,3 @@
-// src/app/api/fournisseurs/route.ts
 import { NextResponse } from "next/server";
 import { FournisseurService } from "@/services/FournisseurService";
 import { prisma } from "@/lib/prisma";
@@ -9,13 +8,16 @@ export async function GET() {
       select: {
         id: true,
         nom: true,
+        contact: true,   // ✅ Ajouté
+        telephone: true, // ✅ Ajouté
+        adresse: true,   // ✅ Ajouté
       },
       orderBy: {
         nom: "asc"
       }
     });
 
-    // Renvoie directement le tableau brut attendu par le front-end
+    // Renvoie le tableau brut attendu par le front-end
     return NextResponse.json(fournisseurs);
   } catch (error: any) {
     console.error("Erreur API Fournisseurs :", error);

@@ -21,15 +21,20 @@ export default function FournisseursPage() {
 
   const loadFournisseurs = async () => {
     try {
-      const res = await fetch("/api/fournisseurs");
+      const res = await fetch("/api/fournisseurs", { cache: "no-store" });
+      if (!res.ok) throw new Error("Erreur serveur lors de la récupération");
+      
       const data = await res.json();
-      setFournisseurs(data);
+      const listeFournisseurs = Array.isArray(data) ? data : [];
+      setFournisseurs([...listeFournisseurs]);
     } catch (err) {
       setError("Erreur de chargement des données");
     }
   };
 
-  useEffect(() => { loadFournisseurs(); }, []);
+  useEffect(() => { 
+    loadFournisseurs(); 
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +52,7 @@ export default function FournisseursPage() {
       if (res.ok) {
         setIsModalOpen(false);
         setFormData({ id: null, nom: "", contact: "", telephone: "", adresse: "" });
-        loadFournisseurs();
+        await loadFournisseurs(); // Recharge immédiatement la liste mise à jour
       } else {
         const data = await res.json();
         setError(data.error || "Une erreur est survenue");
@@ -68,7 +73,7 @@ export default function FournisseursPage() {
       if (res.ok) {
         loadFournisseurs();
       } else {
-        setError(data.error); // Affiche l'erreur si le fournisseur est lié à des produits
+        setError(data.error); 
       }
     } catch (err) {
       setError("Erreur lors de la suppression");
@@ -177,7 +182,7 @@ export default function FournisseursPage() {
                 <label className="text-xs font-semibold text-gray-500 ml-1 uppercase">Contact</label>
                 <input 
                   className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 placeholder:text-gray-400"
-                  value={formData.contact}
+                  value={formData.contact || ""}
                   onChange={e => setFormData({...formData, contact: e.target.value})}
                 />
               </div>
@@ -185,7 +190,7 @@ export default function FournisseursPage() {
                 <label className="text-xs font-semibold text-gray-500 ml-1 uppercase">Téléphone</label>
                 <input 
                   className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-900 placeholder:text-gray-400"
-                  value={formData.telephone}
+                  value={formData.telephone || ""}
                   onChange={e => setFormData({...formData, telephone: e.target.value})}
                 />
               </div>
@@ -193,7 +198,7 @@ export default function FournisseursPage() {
                 <label className="text-xs font-semibold text-gray-500 ml-1 uppercase">Adresse</label>
                 <textarea 
                   className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl outline-none h-20 resize-none text-gray-900 placeholder:text-gray-400"
-                  value={formData.adresse}
+                  value={formData.adresse || ""}
                   onChange={e => setFormData({...formData, adresse: e.target.value})}
                 />
               </div>
