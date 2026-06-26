@@ -44,13 +44,14 @@ export default function ManagerCategoriesPromo() {
   });
 
   // Soumission de la promotion au backend
-const appliquerPromotion = async (e: React.FormEvent) => {
+  const appliquerPromotion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductForPromo) return;
 
     setLoading(true);
     setMessage(null);
 
+    // Définir la date de fin précise
     const dateExpiration = new Date();
     dateExpiration.setDate(dateExpiration.getDate() + dureeJours);
 
@@ -71,11 +72,13 @@ const appliquerPromotion = async (e: React.FormEvent) => {
       const data = await res.json();
 
       if (res.ok) {
+        // CORRECTION : On recharge d'abord les nouvelles données du serveur
+        await fetchData(); 
+        
+        // Puis on affiche le message de succès et ferme la modale
         setMessage({ type: "success", text: `Promotion de ${tauxPromo}% appliquée avec succès !` });
         setSelectedProductForPromo(null);
-        fetchData(); // Recharger les produits mis à jour
       } else {
-        // Affiche l'erreur métier exacte renvoyée par le ProduitService
         setMessage({ type: "error", text: data.error || "Erreur lors de l'application de la promotion." });
       }
     } catch (err) {
@@ -84,6 +87,7 @@ const appliquerPromotion = async (e: React.FormEvent) => {
       setLoading(false);
     }
   };
+
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 font-sans">
       
@@ -168,8 +172,9 @@ const appliquerPromotion = async (e: React.FormEvent) => {
         {/* Grille avec images */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-2">
           {produitsFiltres.map((p) => {
-            // Vérification si le produit a déjà une promo active
-            const aUnePromoActive = p.enPromotion && p.dateFinPromo && new Date(p.dateFinPromo) > new Date();
+            // CORRECTION: Comparaison sécurisée en ramenant la date du jour à l'instant T (sans les millisecondes instables)
+            const maintenant = new Date();
+            const aUnePromoActive = p.enPromotion && p.dateFinPromo && new Date(p.dateFinPromo).getTime() > maintenant.getTime();
             const isLowStock = p.quantiteStock <= 5;
 
             return (

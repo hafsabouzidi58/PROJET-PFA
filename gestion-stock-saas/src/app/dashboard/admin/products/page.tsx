@@ -365,19 +365,22 @@ export default function ProductsPage() {
                 </div>
               </div>
 
-              <div className="modal-form-group">
-                <label className="text-black font-bold" style={{ color: '#000000', fontWeight: '700' }}>Quantité en stock</label>
-                <input 
-                  type="number"
-                  min="0"
-                  placeholder="0"
-                  className="text-black font-bold"
-                  style={{ color: '#000000', fontWeight: '700', border: '2px solid #000' }}
-                  value={formData.stock}
-                  onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                  required
-                />
-              </div>
+              {/* ===== MASQUÉ UNIQUEMENT EN MODE MODIFICATION POUR PASSER PAR LES ENTRÉES/ARRIVAGES ===== */}
+              {!formData.id && (
+                <div className="modal-form-group">
+                  <label className="text-black font-bold" style={{ color: '#000000', fontWeight: '700' }}>Quantité initiale en stock</label>
+                  <input 
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    className="text-black font-bold"
+                    style={{ color: '#000000', fontWeight: '700', border: '2px solid #000' }}
+                    value={formData.stock}
+                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                    required
+                  />
+                </div>
+              )}
 
               <button type="submit" className="btn-submit font-black" style={{ background: '#000000', color: '#ffffff', fontWeight: '900', padding: '14px', borderRadius: '12px', width: '100%', fontSize: '1rem', marginTop: '10px' }}>
                 {formData.id ? "Mettre à jour le produit" : "Créer le produit"}
