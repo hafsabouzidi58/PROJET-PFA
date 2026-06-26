@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Edit, Trash2, Search, X, Truck, Phone, User, AlertCircle } from "lucide-react";
 
 export default function FournisseursPage() {
-  const [fournisseurs, setFournisseurs] = useState([]);
+  const [fournisseurs, setFournisseurs] = useState<Fournisseur[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState("");
