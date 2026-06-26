@@ -5,48 +5,28 @@ import {
   Folder, Package, Percent, Clock, 
   ChevronRight, AlertCircle, CheckCircle, Search 
 } from "lucide-react";
-import './products.css'; // Import du CSS partagé
-
-interface Product {
-  id: number;
-  nom: string;
-  description: string;
-  prixAchat: number;
-  prixVente: number;
-  image: string;
-  quantiteStock: number;
-  categorieId: number;
-  fournisseurId: number;
-  categorie?: { nom: string };
-  fournisseur?: { nom: string };
-  enPromotion?: boolean;
-  dateFinPromo?: string;
-  prixPromotionnel?: number;
-}
 
 export default function ManagerCategoriesPromo() {
   const [categories, setCategories] = useState<any[]>([]);
-  const [produits, setProduits] = useState<Product[]>([]);
+  const [produits, setProduits] = useState<any[]>([]);
   const [selectedCategorie, setSelectedCategorie] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  const [selectedProductForPromo, setSelectedProductForPromo] = useState<Product | null>(null);
-  const [tauxPromo, setTauxPromo] = useState<number>(10);
-  const [dureeJours, setDureeJours] = useState<number>(15);
+  // États pour la gestion de la promotion
+  const [selectedProductForPromo, setSelectedProductForPromo] = useState<any | null>(null);
+  const [tauxPromo, setTauxPromo] = useState<number>(10); // 10% par défaut
+  const [dureeJours, setDureeJours] = useState<number>(15); // 15 jours par défaut
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Chargement initial des catégories et des produits
   const fetchData = async () => {
     try {
       const resCat = await fetch("/api/categories");
       if (resCat.ok) setCategories(await resCat.json());
 
       const resProd = await fetch("/api/products");
-      if (resProd.ok) {
-        const productsData = await resProd.json();
-        console.log("Produits chargés:", productsData); // Debug
-        setProduits(productsData);
-      }
+      if (resProd.ok) setProduits(await resProd.json());
     } catch (err) {
       console.error("Erreur de chargement", err);
     }
@@ -56,13 +36,15 @@ export default function ManagerCategoriesPromo() {
     fetchData();
   }, []);
 
+  // Filtrer les produits appartenant à la catégorie sélectionnée
   const produitsFiltres = produits.filter(p => {
     const matchesCategory = selectedCategorie ? p.categorieId === selectedCategorie.id : true;
     const matchesSearch = p.nom.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
-  const appliquerPromotion = async (e: React.FormEvent) => {
+  // Soumission de la promotion au backend
+const appliquerPromotion = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProductForPromo) return;
 
@@ -91,8 +73,9 @@ export default function ManagerCategoriesPromo() {
       if (res.ok) {
         setMessage({ type: "success", text: `Promotion de ${tauxPromo}% appliquée avec succès !` });
         setSelectedProductForPromo(null);
-        fetchData();
+        fetchData(); // Recharger les produits mis à jour
       } else {
+        // Affiche l'erreur métier exacte renvoyée par le ProduitService
         setMessage({ type: "error", text: data.error || "Erreur lors de l'application de la promotion." });
       }
     } catch (err) {
@@ -101,7 +84,6 @@ export default function ManagerCategoriesPromo() {
       setLoading(false);
     }
   };
-
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 font-sans">
       
@@ -175,6 +157,7 @@ export default function ManagerCategoriesPromo() {
           </div>
         </header>
 
+        {/* Notification Toast */}
         {message && (
           <div className={`p-4 rounded-2xl mb-6 flex items-center gap-3 font-bold text-sm ${message.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
             {message.type === "success" ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
@@ -182,9 +165,10 @@ export default function ManagerCategoriesPromo() {
           </div>
         )}
 
-        {/* GRILLE DES PRODUITS AVEC IMAGES */}
+        {/* Grille avec images */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-2">
           {produitsFiltres.map((p) => {
+            // Vérification si le produit a déjà une promo active
             const aUnePromoActive = p.enPromotion && p.dateFinPromo && new Date(p.dateFinPromo) > new Date();
             const isLowStock = p.quantiteStock <= 5;
 
@@ -282,16 +266,14 @@ export default function ManagerCategoriesPromo() {
         </div>
       </div>
 
-      {/* MODALE PROMOTION */}
+      {/* --- MODALE : CONFIGURER LA PROMOTION FLASH --- */}
       {selectedProductForPromo && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl w-full max-w-md p-6 shadow-2xl border border-gray-100 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-6">
               <div>
                 <h3 className="text-lg font-black uppercase tracking-tight">Appliquer une Promotion</h3>
-                <p className="text-xs text-blue-600 font-bold uppercase mt-0.5 truncate max-w-[280px]">
-                  Produit : {selectedProductForPromo.nom}
-                </p>
+                <p className="text-xs text-blue-600 font-bold uppercase mt-0.5 truncate max-w-[280px]">Produit : {selectedProductForPromo.nom}</p>
               </div>
               <button 
                 onClick={() => setSelectedProductForPromo(null)}
@@ -302,6 +284,7 @@ export default function ManagerCategoriesPromo() {
             </div>
 
             <form onSubmit={appliquerPromotion} className="space-y-6">
+              {/* input Taux de réduction */}
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-wider text-gray-500 block">Pourcentage de Remise (%)</label>
                 <div className="relative">
@@ -318,8 +301,9 @@ export default function ManagerCategoriesPromo() {
                 </div>
               </div>
 
+              {/* input Durée en Jours */}
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-wider text-gray-500 block">Durée de Validité (Jours)</label>
+                <label className="text-xs font-black uppercase tracking-wider text-gray-500 block">Durée de Validité de la Promo (Jours)</label>
                 <div className="relative">
                   <Clock className="absolute left-4 top-3.5 text-gray-400" size={18} />
                   <input 
@@ -333,10 +317,11 @@ export default function ManagerCategoriesPromo() {
                   />
                 </div>
                 <p className="text-[10px] text-amber-600 font-bold bg-amber-50 p-2 rounded-lg mt-1">
-                  💡 Après {dureeJours} jours, le produit reprendra son prix normal
+                  💡 Après {dureeJours} jours, le produit reprendra automatiquement son prix normal de {selectedProductForPromo.prixVente.toFixed(2)} DH.
                 </p>
               </div>
 
+              {/* Calculateur de prévisualisation en temps réel */}
               <div className="bg-gray-900 text-white p-4 rounded-2xl space-y-2">
                 <div className="flex justify-between text-xs text-gray-400 font-bold uppercase">
                   <span>Prix d'origine :</span>
@@ -347,13 +332,14 @@ export default function ManagerCategoriesPromo() {
                   <span>- {((selectedProductForPromo.prixVente * tauxPromo) / 100).toFixed(2)} DH</span>
                 </div>
                 <div className="border-t border-gray-800 pt-2 flex justify-between items-baseline">
-                  <span className="text-xs font-black uppercase tracking-wider text-gray-400">Nouveau prix :</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-gray-400">Nouveau prix promo :</span>
                   <span className="text-xl font-black text-blue-400">
                     {(selectedProductForPromo.prixVente - (selectedProductForPromo.prixVente * tauxPromo) / 100).toFixed(2)} DH
                   </span>
                 </div>
               </div>
 
+              {/* Validation */}
               <button
                 type="submit"
                 disabled={loading}
@@ -365,6 +351,7 @@ export default function ManagerCategoriesPromo() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

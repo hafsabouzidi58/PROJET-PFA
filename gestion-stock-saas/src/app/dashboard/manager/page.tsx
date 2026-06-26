@@ -172,7 +172,7 @@ export default function ManagerDashboardStock() {
               <p className="text-xs font-black text-gray-400 uppercase tracking-wider">Total Références</p>
               <h3 className="text-3xl font-black mt-1 text-gray-900">{totalProduits}</h3>
             </div>
-            <div className="h-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center p-3">
+            <div className="h-12 w-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center p-3">
               <Package size={24} />
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function ManagerDashboardStock() {
               <p className="text-xs font-black uppercase tracking-wider opacity-70">Produits en Rupture</p>
               <h3 className="text-3xl font-black mt-1">{produitsEnRuptureGlobaux.length}</h3>
             </div>
-            <div className={`h-12 h-12 rounded-2xl flex items-center justify-center p-3 ${
+            <div className={`h-12 w-12 rounded-2xl flex items-center justify-center p-3 ${
               produitsEnRuptureGlobaux.length > 0 ? 'bg-red-200 text-red-700' : 'bg-gray-100 text-gray-400'
             }`}>
               <TrendingDown size={24} />
@@ -198,7 +198,7 @@ export default function ManagerDashboardStock() {
               <p className="text-xs font-black text-gray-400 uppercase tracking-wider">Volume de Stock Global</p>
               <h3 className="text-3xl font-black mt-1 text-gray-900">{totalQuantiteStock} <span className="text-sm font-bold text-gray-400">Unités</span></h3>
             </div>
-            <div className="h-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center p-3">
+            <div className="h-12 w-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center p-3">
               <Clock size={24} />
             </div>
           </div>
@@ -226,7 +226,7 @@ export default function ManagerDashboardStock() {
           </div>
         )}
 
-        {/* GRILLE DE VISUALISATION SIMPLE DES PRODUITS FILTRÉS */}
+        {/* GRILLE DE VISUALISATION SIMPLE DES PRODUITS FILTRÉS AVEC IMAGES */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pr-2">
           {produitsFiltres.map((p) => {
             const estEnRupture = p.quantiteStock <= (p.stockMinimum || 0);
@@ -234,20 +234,47 @@ export default function ManagerDashboardStock() {
             return (
               <div 
                 key={p.id} 
-                className={`bg-white border rounded-3xl p-5 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group relative overflow-hidden ${
+                className={`bg-white border rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group ${
                   estEnRupture ? 'border-red-300 bg-red-50/10' : 'border-gray-200'
                 }`}
               >
-                <div>
-                  <div className={`h-12 w-12 rounded-2xl flex items-center justify-center mb-4 transition-all ${
-                    estEnRupture ? 'bg-red-100 text-red-600' : 'bg-gray-50 text-gray-400'
-                  }`}>
-                    <Package size={24} />
+                {/* Image du produit */}
+                <div className="relative h-36 bg-gray-100">
+                  {p.image ? (
+                    <img 
+                      src={p.image} 
+                      alt={p.nom} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <Package size={40} />
+                    </div>
+                  )}
+                  
+                  {/* Badge d'alerte sur l'image */}
+                  {estEnRupture && (
+                    <div className="absolute top-3 right-3 bg-red-500 text-white text-[9px] font-black uppercase px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                      <AlertCircle size={10} /> Rupture
+                    </div>
+                  )}
+                  
+                  <div className="absolute bottom-3 left-3">
+                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${
+                      estEnRupture ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+                    }`}>
+                      {estEnRupture ? '⚠ Stock critique' : '✓ Stock OK'}
+                    </span>
                   </div>
+                </div>
+
+                {/* Corps de la carte */}
+                <div className="p-4 flex flex-col gap-2">
+                  <h3 className="font-black text-sm uppercase tracking-tight truncate">
+                    {p.nom}
+                  </h3>
                   
-                  <h3 className="font-black text-base uppercase mb-1 tracking-tight truncate">{p.nom}</h3>
-                  
-                  <div className="flex flex-col gap-1 items-start mt-2">
+                  <div className="flex flex-col gap-1 items-start mt-1">
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase ${
                       estEnRupture ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'
                     }`}>
@@ -257,9 +284,15 @@ export default function ManagerDashboardStock() {
                       Seuil d'alerte : {p.stockMinimum || 0}
                     </span>
                   </div>
+
+                  {/* Prix du produit */}
+                  <div className="mt-2 pt-2 border-t border-gray-100">
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Prix de vente</p>
+                    <p className="text-lg font-black text-gray-900">
+                      {p.prixVente?.toFixed(2) || '0.00'} <span className="text-xs font-bold text-gray-500">DH</span>
+                    </p>
+                  </div>
                 </div>
-
-
               </div>
             );
           })}
@@ -268,6 +301,7 @@ export default function ManagerDashboardStock() {
             <div className="col-span-full h-64 flex flex-col items-center justify-center text-gray-400 border-2 border-dashed border-gray-200 rounded-3xl">
               <Package size={48} className="mb-2 opacity-40" />
               <p className="font-black uppercase text-sm italic">Aucun article trouvé</p>
+              <p className="text-xs mt-1">Essayez de modifier votre recherche ou votre filtre</p>
             </div>
           )}
         </div>
