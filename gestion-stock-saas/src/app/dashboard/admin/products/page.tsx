@@ -2,7 +2,7 @@
 
 import './products.css';
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Search, X, Package, Upload, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Search, X, Package, Upload } from "lucide-react";
 
 interface Product {
   id: number;
@@ -155,7 +155,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* ===== GRILLE DES PRODUITS EN CARTES ===== */}
+      {/* ===== GRILLE DES PRODUITS ===== */}
       <div className="products-grid">
         {loading ? (
           <div className="products-loading text-black font-bold" style={{ color: '#000000', fontWeight: '700' }}>Chargement...</div>
@@ -169,8 +169,8 @@ export default function ProductsPage() {
                   {p.image ? (
                     <img src={p.image} alt={p.nom} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
                   ) : (
-                    <div className="product-placeholder" style={{ background: '#f8fafc', height: '200px', display: 'flex', alignItems: 'center', justifyInverted: 'center' }}>
-                      <Package style={{ width: '48 h-48', color: '#000' }} />
+                    <div className="product-placeholder" style={{ background: '#f8fafc', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Package style={{ width: '48px', height: '48px', color: '#000000' }} />
                     </div>
                   )}
                   <span className={`product-card-badge-stock ${isLowStock ? 'low' : 'normal'}`} style={{ fontWeight: '800' }}>
@@ -179,7 +179,7 @@ export default function ProductsPage() {
                 </div>
 
                 {/* Corps de la carte */}
-                <div className="product-card-body" style={{ p: '20px', color: '#000000' }}>
+                <div className="product-card-body" style={{ padding: '20px', color: '#000000' }}>
                   <div className="product-card-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h3 className="product-card-name text-black font-black" style={{ color: '#000000', fontWeight: '900', fontSize: '1.25rem', margin: '0 0 4px 0' }}>{p.nom}</h3>
                     <div className="product-card-actions">
@@ -207,7 +207,7 @@ export default function ProductsPage() {
                     </div>
                   </div>
 
-                  {/* ===== DESCRIPTIF DU PRODUIT INTÉGRÉ ===== */}
+                  {/* Descriptif */}
                   <p className="text-black font-medium" style={{ color: '#111111', fontWeight: '500', fontSize: '0.875rem', margin: '6px 0 12px 0', lineHeight: '1.4', background: '#f8fafc', padding: '8px', borderRadius: '8px', borderLeft: '3px solid #000' }}>
                     {p.description ? p.description : "Aucune description rédigée."}
                   </p>
@@ -250,7 +250,7 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* ===== MODALE CORRIGÉE AVEC LES CHAMPS EN NOIR ===== */}
+      {/* ===== MODALE ===== */}
       {isModalOpen && (
         <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
           <div className="modal-content" style={{ border: '2px solid #000', borderRadius: '24px' }}>
@@ -346,8 +346,8 @@ export default function ProductsPage() {
                     onChange={e => setFormData({...formData, categorieId: e.target.value})}
                     required
                   >
-                    <option value="" style={{ color: '#000' }}>Sélectionner...</option>
-                    {categories.map(c => <option key={c.id} value={c.id} style={{ color: '#000' }}>{c.nom}</option>)}
+                    <option value="" style={{ color: '#000000' }}>Sélectionner...</option>
+                    {categories.map(c => <option key={c.id} value={c.id} style={{ color: '#000000' }}>{c.nom}</option>)}
                   </select>
                 </div>
                 <div className="modal-form-group">
@@ -359,8 +359,8 @@ export default function ProductsPage() {
                     onChange={e => setFormData({...formData, fournisseurId: e.target.value})}
                     required
                   >
-                    <option value="" style={{ color: '#000' }}>Sélectionner...</option>
-                    {fournisseurs.map(f => <option key={f.id} value={f.id} style={{ color: '#000' }}>{f.nom}</option>)}
+                    <option value="" style={{ color: '#000000' }}>Sélectionner...</option>
+                    {fournisseurs.map(f => <option key={f.id} value={f.id} style={{ color: '#000000' }}>{f.nom}</option>)}
                   </select>
                 </div>
               </div>
